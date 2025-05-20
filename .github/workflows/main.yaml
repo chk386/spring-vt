@@ -1,17 +1,21 @@
-
-name: Our First Workflow
-on: push
+name: Pull Request Webhook
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
 
 jobs:
-  echo:
+  notify-pr:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello, Github Actions!"
-  pwd-ls:
-    name: PWD & LS
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print working directory
-        run: pwd
-      - name: List files 
-        run: ls -al
+      - name: Send PR notification
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "action": "${{ github.event.action }}",
+              "pr_number": ${{ github.event.pull_request.number }},
+              "pr_title": "${{ github.event.pull_request.title }}",
+              "pr_state": "${{ github.event.pull_request.state }}",
+              "pr_url": "${{ github.event.pull_request.html_url }}"
+            }' \
+            https://nice-cycles-win.loca.lt/api/v1/review?a=b
