@@ -16,6 +16,9 @@ jobs:
               "pr_number": ${{ github.event.pull_request.number }},
               "pr_title": "${{ github.event.pull_request.title }}",
               "pr_state": "${{ github.event.pull_request.state }}",
-              "pr_url": "${{ github.event.pull_request.html_url }}"
+              "pr_url": "${{ github.event.pull_request.html_url }}",
+              "html_url": "${{ github.event.pull_request.html_url }}",
+              "diff_url": "${{ github.event.pull_request.diff_url }}",
+              "patch_url": "${{ github.event.pull_request.patch_url }}",
             }' \
-            https://nice-cycles-win.loca.lt/api/v1/review?a=bbc
+            https://nhncommerce.loca.lt/api/v1/review?a=bbc
