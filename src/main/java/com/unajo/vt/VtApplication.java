@@ -85,6 +85,10 @@ public class VtApplication {
 
 					return ServerResponse.ok().body(Map.of("done", true));
 				})
+				.GET("/test", request -> {
+
+					return ServerResponse.ok().body(Map.of("Test", true));
+				})
 				.build();
 	}
 
