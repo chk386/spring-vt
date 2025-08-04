@@ -6,15 +6,21 @@ option java_outer_classname = "AdoptionsProto";
 option java_package = "com.unajo.adoptions";
 
 service Adoptions {
-    rpc All(google.protobuf.Empty) returns (DogsResponse);
+  rpc All(google.protobuf.Empty) returns (DogsResponse);
+  rpc Delay(DelayRequest) returns (DelayResponse);
 }
 
-message DogsResponse {
-    repeated Dog Dogs = 1;
-}
+message DogsResponse { repeated Dog Dogs = 1; }
 
 message Dog {
-    int32 id = 1;
-    string name = 2;
-    string description = 3;
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message DelayRequest { int32 seconds = 1; }
+
+message DelayResponse {
+  bool done = 1;
+  string message = 2;
 }

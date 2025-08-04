@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.4.6'
     id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.google.protobuf' version '0.9.4'
+    id 'com.google.protobuf' version '0.9.4'
 }
 
 group = 'com.unajo'
@@ -22,49 +22,47 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-config-server'
-	implementation 'io.grpc:grpc-services'
-	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    implementation 'io.grpc:grpc-services'
+    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.grpc:spring-grpc-test'
+    testImplementation 'org.springframework.grpc:spring-grpc-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 ext {
     set('springCloudVersion', '2024.0.1')
-	set('springGrpcVersion', "0.8.0")
+    set('springGrpcVersion', "0.8.0")
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-		mavenBom "org.springframework.grpc:spring-grpc-dependencies:${springGrpcVersion}"
+        mavenBom "org.springframework.grpc:spring-grpc-dependencies:${springGrpcVersion}"
     }
 }
 
 protobuf {
-  protoc {
-    artifact = 'com.google.protobuf:protoc'
-  }
-  plugins {
-    grpc {
-      artifact = 'io.grpc:protoc-gen-grpc-java'
+    protoc {
+        artifact = 'com.google.protobuf:protoc'
     }
-  }
-  generateProtoTasks {
-    all()*.plugins {
-      grpc {
-        option 'jakarta_omit'
-        option '@generated=omit'
-      }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java'
+        }
     }
-  }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {
+                option 'jakarta_omit'
+                option '@generated=omit'
+            }
+        }
+    }
 }
-
 
 tasks.named('test') {
     useJUnitPlatform()

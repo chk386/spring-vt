@@ -23,6 +23,8 @@ import org.springframework.web.servlet.function.ServerResponse;
 
 import com.google.protobuf.Empty;
 import com.unajo.adoptions.AdoptionsGrpc;
+import com.unajo.adoptions.DelayRequest;
+import com.unajo.adoptions.DelayResponse;
 import com.unajo.adoptions.Dog;
 import com.unajo.adoptions.DogsResponse;
 
@@ -30,6 +32,12 @@ import io.grpc.stub.StreamObserver;
 
 @Service
 class DogAdoptionsGrpcService extends AdoptionsGrpc.AdoptionsImplBase {
+
+	private final RestClient restClient;
+
+	public DogAdoptionsGrpcService(RestClient restClient) {
+		this.restClient = restClient;
+	}
 
 	@Override
 	public void all(Empty request, StreamObserver<DogsResponse> responseObserver) {
@@ -40,8 +48,54 @@ class DogAdoptionsGrpcService extends AdoptionsGrpc.AdoptionsImplBase {
 				.setDescription("정말 귀엽고 사랑스럽다")
 				.build();
 
+		var response = DogsResponse.newBuilder()
+				.addDogs(dog)
+				.build();
+
+		responseObserver.onNext(response);
+		responseObserver.onCompleted();
 	}
 
+	@Override
+	public void delay(com.unajo.adoptions.DelayRequest request,
+			StreamObserver<com.unajo.adoptions.DelayResponse> responseObserver) {
+
+		var seconds = request.getSeconds();
+		var log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+		try {
+			log.info("gRPC delay request for {} seconds", seconds);
+
+			// REST API 호출과 동일한 로직
+			var requestToHttpBin = restClient
+					.get()
+					.uri("/delay/" + seconds)
+					.retrieve()
+					.toEntity(String.class);
+
+			log.info("gRPC delay completed with status: {} on thread: {}",
+					requestToHttpBin.getStatusCode(), Thread.currentThread());
+
+			var response = com.unajo.adoptions.DelayResponse.newBuilder()
+					.setDone(true)
+					.setMessage("Delay of " + seconds + " seconds completed successfully")
+					.build();
+
+			responseObserver.onNext(response);
+			responseObserver.onCompleted();
+
+		} catch (Exception e) {
+			log.error("Error in gRPC delay: ", e);
+
+			var errorResponse = com.unajo.adoptions.DelayResponse.newBuilder()
+					.setDone(false)
+					.setMessage("Error: " + e.getMessage())
+					.build();
+
+			responseObserver.onNext(errorResponse);
+			responseObserver.onCompleted();
+		}
+	}
 }
 
 @SpringBootApplication
